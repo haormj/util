@@ -1,4 +1,4 @@
-# Util
+# Util [![Build Status](https://travis-ci.org/haormj/util.svg?branch=master)](https://travis-ci.org/haormj/util) [![GoDoc](https://godoc.org/github.com/haormj/util?status.svg)](https://godoc.org/github.com/haormj/util) [![Go Report Card](https://goreportcard.com/badge/github.com/haormj/util)](https://goreportcard.com/report/github.com/haormj/util)
 
 Golang util tools
 
