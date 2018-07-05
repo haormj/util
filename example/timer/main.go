@@ -5,12 +5,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/haormj/timer"
+	"github.com/haormj/util"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	timer.DailyTaskCST(ctx, 11, 20, 0, func() {
+	util.DailyTaskCST(ctx, 11, 20, 0, func() {
 		log.Println("hello timer")
 	})
 	select {
