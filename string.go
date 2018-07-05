@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strings"
 	"sync"
 )
 
@@ -24,4 +25,10 @@ func (ss *SecurityString) Get() (data string) {
 	data = ss.data
 	ss.RUnlock()
 	return
+}
+
+// TrimSpaceAndSlash trim space first, then trim slash
+func TrimSpaceAndSlash(s string) string {
+	s = strings.TrimSpace(s)
+	return strings.Trim(s, "/")
 }
