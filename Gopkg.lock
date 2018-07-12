@@ -8,6 +8,12 @@
   revision = "24b0969c4cb722950103eed87108c8d291a8df00"
 
 [[projects]]
+  name = "github.com/patrickmn/go-cache"
+  packages = ["."]
+  revision = "a3647f8e31d79543b2d0f0ae2fe5c379d72cedc0"
+  version = "v2.1.0"
+
+[[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
   revision = "8965335b8c7107321228e3e3702cab9832751bac"
@@ -16,6 +22,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "dce3569126e711c39b3dbbc686ccac681af46460870fd95ba517366a4da60551"
+  inputs-digest = "4494b8df0630261189883c26d5a3684d18d146ebc52ad6a51fd87a7af169db36"
   solver-name = "gps-cdcl"
   solver-version = 1
