@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/golang/groupcache"
+  packages = ["lru"]
+  revision = "24b0969c4cb722950103eed87108c8d291a8df00"
+
+[[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
   revision = "8965335b8c7107321228e3e3702cab9832751bac"
@@ -10,6 +16,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "81fa09c73e45f97bbc40aefd4ee4b94eaeef3ce760b54348e5fd75aed6b3ec18"
+  inputs-digest = "dce3569126e711c39b3dbbc686ccac681af46460870fd95ba517366a4da60551"
   solver-name = "gps-cdcl"
   solver-version = 1
