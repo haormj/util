@@ -70,5 +70,5 @@ func TestRandomString(t *testing.T) {
 }
 
 func TestRandomStringByLetterAndDigital(t *testing.T) {
-	log.Println(RandomStringByLetterAndDigital(10))
+	log.Println(RandomStringByLetterAndDigital(43))
 }
