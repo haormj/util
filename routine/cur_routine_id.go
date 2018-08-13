@@ -10,7 +10,8 @@ import (
 )
 
 // CurGoroutineID get current go routine ID
-// https://github.com/golang/net/blob/master/http2/gotrack.go#L51
+// ref https://github.com/golang/net/blob/master/http2/gotrack.go#L51
+// not recommended http://lanlingzi.cn/post/technical/2016/0813_go_gls/
 func CurGoroutineID() uint64 {
 	bp := littleBuf.Get().(*[]byte)
 	defer littleBuf.Put(bp)
