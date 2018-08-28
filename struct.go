@@ -17,7 +17,7 @@ type StructField struct {
 
 func (sf *StructField) Bool() (bool, bool) {
 	if sf.IsExist {
-		return cast.ToBool(sf.FieldValue), sf.IsExist
+		return cast.ToBool(sf.FieldValue.Interface()), sf.IsExist
 	} else {
 		return false, sf.IsExist
 	}
@@ -25,7 +25,7 @@ func (sf *StructField) Bool() (bool, bool) {
 
 func (sf *StructField) BoolE() (bool, bool, error) {
 	if sf.IsExist {
-		b, err := cast.ToBoolE(sf.FieldValue)
+		b, err := cast.ToBoolE(sf.FieldValue.Interface())
 		return b, sf.IsExist, err
 	} else {
 		return false, sf.IsExist, nil
@@ -34,7 +34,7 @@ func (sf *StructField) BoolE() (bool, bool, error) {
 
 func (sf *StructField) Int() (int, bool) {
 	if sf.IsExist {
-		return cast.ToInt(sf.FieldValue), sf.IsExist
+		return cast.ToInt(sf.FieldValue.Interface()), sf.IsExist
 	} else {
 		return 0, sf.IsExist
 	}
@@ -42,7 +42,7 @@ func (sf *StructField) Int() (int, bool) {
 
 func (sf *StructField) IntE() (int, bool, error) {
 	if sf.IsExist {
-		i, err := cast.ToIntE(sf.FieldValue)
+		i, err := cast.ToIntE(sf.FieldValue.Interface())
 		return i, sf.IsExist, err
 	} else {
 		return 0, sf.IsExist, nil
@@ -51,7 +51,7 @@ func (sf *StructField) IntE() (int, bool, error) {
 
 func (sf *StructField) Float64() (float64, bool) {
 	if sf.IsExist {
-		return cast.ToFloat64(sf.FieldValue), sf.IsExist
+		return cast.ToFloat64(sf.FieldValue.Interface()), sf.IsExist
 	} else {
 		return 0, sf.IsExist
 	}
@@ -59,7 +59,7 @@ func (sf *StructField) Float64() (float64, bool) {
 
 func (sf *StructField) Float64E() (float64, bool, error) {
 	if sf.IsExist {
-		f, err := cast.ToFloat64E(sf.FieldValue)
+		f, err := cast.ToFloat64E(sf.FieldValue.Interface())
 		return f, sf.IsExist, err
 	} else {
 		return 0, sf.IsExist, nil
@@ -68,7 +68,7 @@ func (sf *StructField) Float64E() (float64, bool, error) {
 
 func (sf *StructField) String() (string, bool) {
 	if sf.IsExist {
-		return cast.ToString(sf.FieldValue), sf.IsExist
+		return cast.ToString(sf.FieldValue.Interface()), sf.IsExist
 	} else {
 		return "", sf.IsExist
 	}
@@ -76,7 +76,7 @@ func (sf *StructField) String() (string, bool) {
 
 func (sf *StructField) StringE() (string, bool, error) {
 	if sf.IsExist {
-		str, err := cast.ToStringE(sf.FieldValue)
+		str, err := cast.ToStringE(sf.FieldValue.Interface())
 		return str, sf.IsExist, err
 	} else {
 		return "", sf.IsExist, nil
@@ -96,10 +96,19 @@ func SetStructField(v interface{}, fieldValue interface{}, fieldNames ...string)
 	if !sf.FieldValue.CanSet() {
 		return false
 	}
-	if sf.Field.Type != reflect.TypeOf(fieldValue) {
-		return false
+	fieldValueType := reflect.TypeOf(fieldValue)
+	fieldValueValue := reflect.ValueOf(fieldValue)
+	if sf.Field.Type != fieldValueType {
+		if sf.FieldValue.Kind() == reflect.Ptr &&
+			sf.Field.Type.Elem() == fieldValueType {
+			v := reflect.New(fieldValueType)
+			v.Elem().Set(fieldValueValue)
+			fieldValueValue = v
+		} else {
+			return false
+		}
 	}
-	sf.FieldValue.Set(reflect.ValueOf(fieldValue))
+	sf.FieldValue.Set(fieldValueValue)
 	return true
 }
 
