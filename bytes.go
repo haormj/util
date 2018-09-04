@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 )
 
@@ -26,5 +27,5 @@ func BytesCombine(pBytes ...[]byte) []byte {
 
 // BytesToHex bytes to hexadecimal
 func BytesToHex(src []byte) string {
-	return fmt.Sprintf("%x", src)
+	return hex.EncodeToString(src)
 }

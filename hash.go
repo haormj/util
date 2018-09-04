@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/hex"
 )
 
 // Md5 call golang md5
@@ -22,7 +23,7 @@ func Md5ToString(p []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return BytesToHex(b), nil
+	return hex.EncodeToString(b), nil
 }
 
 // Sha256 golang sha256
