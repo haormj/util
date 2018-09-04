@@ -14,6 +14,12 @@
   version = "v2.1.0"
 
 [[projects]]
+  name = "github.com/satori/go.uuid"
+  packages = ["."]
+  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
+  version = "v1.2.0"
+
+[[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
   revision = "8965335b8c7107321228e3e3702cab9832751bac"
@@ -22,6 +28,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4494b8df0630261189883c26d5a3684d18d146ebc52ad6a51fd87a7af169db36"
+  inputs-digest = "782d2e8b9460fbec9112ab04bddb9ce5e44ebb21d32d6dbfc8820af5b7dbc3df"
   solver-name = "gps-cdcl"
   solver-version = 1
