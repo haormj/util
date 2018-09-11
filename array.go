@@ -24,3 +24,21 @@ func ArrayJoinInt(a []int, sep string) string {
 	str = strings.Trim(str, sep)
 	return str
 }
+
+// ArrayDistinctInt array distinct
+func ArrayDistinctInt(src []int) []int {
+	dst := make([]int, 0)
+	for _, s := range src {
+		flag := false
+		for _, d := range dst {
+			if s == d {
+				flag = true
+				break
+			}
+		}
+		if !flag {
+			dst = append(dst, s)
+		}
+	}
+	return dst
+}
