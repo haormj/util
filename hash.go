@@ -17,8 +17,8 @@ func Md5(p []byte) ([]byte, error) {
 	return hash.Sum(nil), nil
 }
 
-// Md5ToString result to hex
-func Md5ToString(p []byte) (string, error) {
+// Md5ToHex result to hex
+func Md5ToHex(p []byte) (string, error) {
 	b, err := Md5(p)
 	if err != nil {
 		return "", err
@@ -33,6 +33,15 @@ func Sha256(p []byte) ([]byte, error) {
 		return nil, err
 	}
 	return hash.Sum(nil), nil
+}
+
+// Sha256ToHex result to hex
+func Sha256ToHex(p []byte) (string, error) {
+	b, err := Sha256(p)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
 }
 
 // HmacSha1 call golang hmac
