@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -41,4 +42,26 @@ func ArrayDistinctInt(src []int) []int {
 		}
 	}
 	return dst
+}
+
+// ArraySortAscInt sort int array asc
+func ArraySortAscInt(src []int) {
+	sort.Slice(src, func(i int, j int) bool {
+		if src[i] < src[j] {
+			return true
+		} else {
+			return false
+		}
+	})
+}
+
+// ArraySortDescInt sort int array desc
+func ArraySortDescInt(src []int) {
+	sort.Slice(src, func(i int, j int) bool {
+		if src[i] > src[j] {
+			return true
+		} else {
+			return false
+		}
+	})
 }
