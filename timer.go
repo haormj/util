@@ -3,6 +3,7 @@ package util
 import (
 	"context"
 	"log"
+	"runtime/debug"
 	"time"
 )
 
@@ -18,6 +19,7 @@ func DailyTask(ctx context.Context, hour, minute, second int, loc *time.Location
 		defer func() {
 			if err := recover(); err != nil {
 				log.Printf("exec callback panic, %v\n", err)
+				log.Printf("stack:%s", debug.Stack())
 				// rerun DailyTask
 				go DailyTask(ctx, hour, minute, second, loc, callback)
 			}
