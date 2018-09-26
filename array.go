@@ -26,6 +26,16 @@ func ArrayJoinInt(a []int, sep string) string {
 	return str
 }
 
+// ArrayJoinUint32 join uint32 array
+func ArrayJoinUint32(a []uint32, sep string) string {
+	str := ""
+	for _, i := range a {
+		str += fmt.Sprintf("%d%s", i, sep)
+	}
+	str = strings.Trim(str, sep)
+	return str
+}
+
 // ArrayDistinctInt array distinct
 func ArrayDistinctInt(src []int) []int {
 	dst := make([]int, 0)

@@ -21,3 +21,7 @@ func TestArraySortDescInt(t *testing.T) {
 	ArraySortDescInt(a)
 	t.Log(a)
 }
+
+func TestArrayJoinUint32(t *testing.T) {
+	t.Log(ArrayJoinUint32([]uint32{1, 3, 2}, ","))
+}
