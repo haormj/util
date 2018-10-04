@@ -61,6 +61,11 @@ func (d *Dispatcher) CurrentWorkers() int {
 	return d.maxWorkers
 }
 
+// CurrentIdleWorkers current idle workers
+func (d *Dispatcher) CurrentIdleWorkers() int {
+	return len(d.WorkerPool)
+}
+
 // MaxWorkers max workers
 func (d *Dispatcher) MaxWorkers() int {
 	return d.maxWorkers
@@ -97,7 +102,8 @@ func NewWorker(workerPool chan chan Job) Worker {
 	return Worker{
 		WorkerPool: workerPool,
 		JobChannel: make(chan Job),
-		quit:       make(chan bool)}
+		quit:       make(chan bool),
+	}
 }
 
 // Start method starts the run loop for the worker, listening for a quit channel in
