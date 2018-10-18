@@ -2,6 +2,12 @@ package util
 
 import "testing"
 
+func TestArrayReverseInt64(t *testing.T) {
+	a := []int64{1, 2}
+	ArrayReverseInt64(a)
+	t.Log(a)
+}
+
 func TestArrayJoinInt(t *testing.T) {
 	t.Log(ArrayJoinInt([]int{1, 2, 3}, ","))
 }

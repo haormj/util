@@ -25,12 +25,15 @@ func DecimalToAny(i int64, base int) []int64 {
 		a = append(a, remainder)
 	}
 	// reverse a
-	return ArrayReverseInt64(a)
+	ArrayReverseInt64(a)
+	return a
 }
 
 // AnyToDecimal any to decimal
 func AnyToDecimal(b []int64, base int) int64 {
-	a := ArrayReverseInt64(b)
+	a := make([]int64, len(b))
+	copy(a, b)
+	ArrayReverseInt64(a)
 	var i, power int64
 	for j, v := range a {
 		if j == 0 {
