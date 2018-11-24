@@ -82,3 +82,30 @@ func ArrayContainsString(a []string, e string) bool {
 	}
 	return false
 }
+
+// ArrayUnionString string union
+func ArrayUnionString(a []string, b []string) []string {
+	t := make([]string, 0)
+	for _, s := range a {
+		if !ArrayContainsString(t, s) {
+			t = append(t, s)
+		}
+	}
+	for _, s := range b {
+		if !ArrayContainsString(t, s) {
+			t = append(t, s)
+		}
+	}
+	return t
+}
+
+// ArrayIntersectString string intersect
+func ArrayIntersectString(a []string, b []string) []string {
+	t := make([]string, 0)
+	for _, s := range a {
+		if ArrayContainsString(b, s) {
+			t = append(t, s)
+		}
+	}
+	return t
+}

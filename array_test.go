@@ -36,3 +36,11 @@ func TestArrayContainsString(t *testing.T) {
 	t.Log(ArrayContainsString([]string{"hello", "world"}, "hello"))
 	t.Log(ArrayContainsString([]string{"hello", "world"}, "nihao"))
 }
+
+func TestArrayIntersectString(t *testing.T) {
+	t.Log(ArrayIntersectString([]string{"hello", "world"}, []string{"hello", "nihao"}))
+}
+
+func TestArrayUnionString(t *testing.T) {
+	t.Log(ArrayUnionString([]string{"hello", "world"}, []string{"hello", "nihao"}))
+}
