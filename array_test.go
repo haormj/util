@@ -31,3 +31,8 @@ func TestArraySortDescInt(t *testing.T) {
 func TestArrayJoinUint32(t *testing.T) {
 	t.Log(ArrayJoinUint32([]uint32{1, 3, 2}, ","))
 }
+
+func TestArrayContainsString(t *testing.T) {
+	t.Log(ArrayContainsString([]string{"hello", "world"}, "hello"))
+	t.Log(ArrayContainsString([]string{"hello", "world"}, "nihao"))
+}
