@@ -13,6 +13,13 @@ func ArrayReverseInt64(a []int64) {
 	}
 }
 
+// ArrayReverseString stirng array reverse
+func ArrayReverseString(a []string) {
+	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
+		a[i], a[j] = a[j], a[i]
+	}
+}
+
 // ArrayJoinInt join int array
 func ArrayJoinInt(a []int, sep string) string {
 	str := ""
