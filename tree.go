@@ -75,7 +75,7 @@ func (t *Tree) BFS(fn func(*Node)) {
 // Node definition
 type Node struct {
 	Parent   *Node
-	Entries  []Entry
+	Data     map[string]interface{}
 	Children []*Node
 }
 
@@ -153,10 +153,4 @@ func (n *Node) AddChild(c *Node) {
 		cc.Parent = c
 	}
 	n.Children = append(n.Children, c)
-}
-
-// Entry data
-type Entry struct {
-	Key   interface{}
-	Value interface{}
 }

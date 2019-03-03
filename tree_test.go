@@ -14,59 +14,44 @@ func TestTree(t *testing.T) {
 	*/
 	tree := Tree{
 		Root: &Node{
-			Entries: []Entry{
-				{
-					Key:   "ID",
-					Value: "A",
-				},
+			Data: map[string]interface{}{
+				"ID": "A",
 			},
 		},
 	}
 	tree.Root.AddChild(&Node{
-		Entries: []Entry{
-			{
-				Key:   "ID",
-				Value: "B",
-			},
+		Data: map[string]interface{}{
+			"ID": "B",
 		},
 		Children: []*Node{
 			{
-				Entries: []Entry{
-					{
-						Key:   "ID",
-						Value: "E",
-					},
+				Data: map[string]interface{}{
+					"ID": "E",
 				},
 			},
 		},
 	})
 	tree.Root.AddChild(&Node{
-		Entries: []Entry{
-			{
-				Key:   "ID",
-				Value: "C",
-			},
+		Data: map[string]interface{}{
+			"ID": "C",
 		},
 	})
 	tree.Root.AddChild(&Node{
-		Entries: []Entry{
-			{
-				Key:   "ID",
-				Value: "D",
-			},
+		Data: map[string]interface{}{
+			"ID": "D",
 		},
 	})
 	fmt.Println("BFS")
 	tree.BFS(func(n *Node) {
-		fmt.Print(n.Entries, " ")
+		fmt.Print(n.Data, " ")
 	})
 	fmt.Println("\npre order")
 	tree.DFSPreOrder(func(n *Node) {
-		fmt.Print(n.Entries, " ")
+		fmt.Print(n.Data, " ")
 	})
 	fmt.Println("\npost order")
 	tree.DFSPostOrder(func(n *Node) {
-		fmt.Print(n.Entries, " ")
+		fmt.Print(n.Data, " ")
 	})
 	fmt.Println("\ndepth: ", tree.Depth())
 	fmt.Println("degree: ", tree.Degree())
