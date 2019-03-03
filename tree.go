@@ -2,20 +2,13 @@ package util
 
 import (
 	"container/list"
+	"fmt"
+	"strings"
 )
 
 // Tree definition
 type Tree struct {
 	Root *Node
-}
-
-// Clear tree
-func (t *Tree) Clear() {
-}
-
-// Size -
-func (t *Tree) Size() int {
-	return 0
 }
 
 // Depth the largest depth of the node
@@ -72,11 +65,38 @@ func (t *Tree) BFS(fn func(*Node)) {
 	t.Root.BFS(fn)
 }
 
+// Search node by key
+func (t *Tree) Search(key string, compare func(interface{}, interface{}) bool,
+	values ...string) (*Node, bool) {
+	return t.Root.Search(key, compare, values...)
+}
+
+func (t *Tree) Insert(key string, compare func(interface{}, interface{}) bool,
+	values ...string) *Node {
+	return t.Root.Insert(key, compare, values...)
+}
+
+func (t *Tree) String() string {
+	return t.Root.String()
+}
+
 // Node definition
 type Node struct {
 	Parent   *Node
 	Data     map[string]interface{}
 	Children []*Node
+	Format   func(*Node) string
+}
+
+func NewNode() *Node {
+	return &Node{
+		Parent:   nil,
+		Data:     make(map[string]interface{}),
+		Children: make([]*Node, 0),
+		Format: func(n *Node) string {
+			return fmt.Sprintf("%+v", n.Data)
+		},
+	}
 }
 
 // Depth the number of edges between the node and the root.
@@ -152,5 +172,88 @@ func (n *Node) AddChild(c *Node) {
 	for _, cc := range c.Children {
 		cc.Parent = c
 	}
+	if c.Format == nil {
+		c.Format = n.Format
+	}
 	n.Children = append(n.Children, c)
+}
+
+func (n *Node) Put(key string, value interface{}) {
+	n.Data[key] = value
+}
+
+func (n *Node) Get(key string) (interface{}, bool) {
+	value, ok := n.Data[key]
+	return value, ok
+}
+
+func (n *Node) Search(key string, compare func(interface{}, interface{}) bool,
+	values ...string) (*Node, bool) {
+	if len(values) == 0 {
+		return nil, false
+	}
+	value := values[0]
+	values = values[1:]
+	for _, child := range n.Children {
+		v, ok := child.Get(key)
+		if !ok {
+			continue
+		}
+		if compare(v, value) {
+			if len(values) == 0 {
+				return child, true
+			} else {
+				return child.Search(key, compare, values...)
+			}
+		}
+	}
+	return nil, false
+}
+
+func (n *Node) Insert(key string, compare func(interface{}, interface{}) bool,
+	values ...string) *Node {
+	if len(values) == 0 {
+		return n
+	}
+	value := values[0]
+	values = values[1:]
+	var flag bool
+	var child *Node
+	for _, child = range n.Children {
+		v, ok := child.Get(key)
+		if !ok {
+			continue
+		}
+		if compare(v, value) {
+			flag = true
+			break
+		}
+	}
+	// node don't exist
+	var node *Node
+	if !flag {
+		node = NewNode()
+		node.Put(key, value)
+		n.AddChild(node)
+	} else {
+		node = child
+	}
+	if len(values) == 0 {
+		return node
+	} else {
+		return node.Insert(key, compare, values...)
+	}
+}
+
+func (n *Node) stringWithFormat(fn func(*Node) string) string {
+	str := strings.Repeat("    ", n.Depth()) + fn(n)
+	for _, child := range n.Children {
+		str += "\n" + child.stringWithFormat(fn)
+	}
+	return str
+}
+
+// String
+func (n *Node) String() string {
+	return n.stringWithFormat(n.Format)
 }
