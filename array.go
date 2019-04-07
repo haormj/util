@@ -116,3 +116,33 @@ func ArrayIntersectString(a []string, b []string) []string {
 	}
 	return t
 }
+
+// ArraySymDiffString symmetric difference
+func ArraySymDiffString(a []string, b []string) []string {
+	t := make([]string, 0)
+	c := make([]string, len(b))
+	copy(c, b)
+	for _, s := range a {
+		var flag bool
+		var j int
+		for i := 0; i < len(c); i++ {
+			if s == c[i] {
+				flag = true
+				j = i
+				break
+			}
+		}
+
+		if flag {
+			if j+1 < len(c) {
+				c = append(c[:j], c[j+1:]...)
+			} else {
+				c = c[:j]
+			}
+		} else {
+			t = append(t, s)
+		}
+	}
+	t = append(t, c...)
+	return t
+}

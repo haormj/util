@@ -44,3 +44,7 @@ func TestArrayIntersectString(t *testing.T) {
 func TestArrayUnionString(t *testing.T) {
 	t.Log(ArrayUnionString([]string{"hello", "world"}, []string{"hello", "nihao"}))
 }
+
+func TestArraySymDiffString(t *testing.T) {
+	t.Log(ArraySymDiffString([]string{"1", "2", "3", "4", "5"}, []string{"4", "5", "6", "7", "8"}))
+}
