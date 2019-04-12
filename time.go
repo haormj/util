@@ -22,3 +22,8 @@ func CSTE() (*time.Location, error) {
 	}
 	return loc, nil
 }
+
+// Millisecond get current milli second
+func Millisecond() int64 {
+	return time.Now().UnixNano() / 1000000
+}
