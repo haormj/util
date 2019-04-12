@@ -6,9 +6,10 @@ import (
 )
 
 type Hello struct {
-	Name  *string
-	Age   int
-	World World
+	Name   *string
+	Age    int
+	Weight int64
+	World  World
 }
 
 type World struct {
@@ -38,6 +39,7 @@ func TestSetStructField(t *testing.T) {
 	t.Log(SetStructField(hello, 18, "Age"))
 	t.Log(SetStructField(hello, "male", "World", "Sex"))
 	t.Log(SetStructField(hello, "eat", "World", "Habit"))
+	t.Log(SetStructField(hello, 20, "Weight"))
 	helloBytes, err := json.Marshal(hello)
 	if err != nil {
 		t.Fatal(err)
