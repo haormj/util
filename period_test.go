@@ -979,3 +979,85 @@ func TestPeriodsIntersect(t *testing.T) {
 		})
 	}
 }
+
+func TestPeriodsSort(t *testing.T) {
+	var newPeriods = func(se ...int64) []Period {
+		ps, _ := NewPeriods(se...)
+		return ps
+	}
+	type args struct {
+		a []Period
+	}
+	tests := []struct {
+		name string
+		args args
+		want []Period
+	}{
+		{
+			args: args{
+				a: newPeriods(3, 4, 1, 2, 8, 9, 20, 30, 12, 14),
+			},
+			want: newPeriods(1, 2, 3, 4, 8, 9, 12, 14, 20, 30),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmp := make([]Period, len(tt.args.a))
+			copy(tmp, tt.args.a)
+			sort.Sort(Periods(tmp))
+			got := []Period(tmp)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TestPeriodsSort() args: %v, got: %v, want %v", tt.args.a, got, tt.want)
+			}
+		})
+	}
+
+}
+
+func TestPeriodsComplement(t *testing.T) {
+	var newPeriods = func(se ...int64) []Period {
+		ps, _ := NewPeriods(se...)
+		return ps
+	}
+	type args struct {
+		a []Period
+	}
+	tests := []struct {
+		name string
+		args args
+		want []Period
+	}{
+		{
+			args: args{
+				a: newPeriods(),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				a: newPeriods(0, 0),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				a: newPeriods(0, 0, 1, 2),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				a: newPeriods(1, 2, 5, 6, 10, 10, 20, 30, 60, -1),
+			},
+			want: newPeriods(3, 4, 7, 9, 11, 19, 31, 59),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PeriodsComplement(tt.args.a); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodsIntersect() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+

@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"sort"
 )
 
 var (
@@ -25,6 +26,27 @@ func (p Period) St() int64 {
 
 func (p Period) Et() int64 {
 	return p.et
+}
+
+type Periods []Period
+
+// Len is the number of elements in the collection.
+func (p Periods) Len() int {
+	return len(p)
+}
+
+// Less reports whether the element with
+// index i should sort before the element with index j.
+func (p Periods) Less(i, j int) bool {
+	if p[i].st < p[j].st {
+		return true
+	}
+	return false
+}
+
+// Swap swaps the elements with indexes i and j.
+func (p Periods) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
 }
 
 // NewPeriod create a period
@@ -259,6 +281,29 @@ func PeriodsIntersect(a []Period, b []Period) []Period {
 			k := PeriodIntersect(i, j)
 			c = append(c, k...)
 		}
+	}
+	return c
+}
+
+// PeriodsComplement periods complement
+// u = [a.min_st, a.max_et]
+// https://en.wikipedia.org/wiki/Complement_(set_theory)
+func PeriodsComplement(a []Period) []Period {
+	if len(a) < 1 {
+		return []Period{}
+	}
+	b := PeriodsUnion(a, []Period{})
+	sort.Sort(Periods(b))
+	c := make([]Period, 0)
+	for i := 0; i < len(b)-1; i++ {
+		st := b[i].et + 1
+		// et not negative
+		et := b[i+1].st - 1
+		p, err := NewPeriod(st, et)
+		if err != nil {
+			continue
+		}
+		c = append(c, p)
 	}
 	return c
 }
