@@ -2,6 +2,7 @@ package util
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -1060,4 +1061,3 @@ func TestPeriodsComplement(t *testing.T) {
 		})
 	}
 }
-
