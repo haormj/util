@@ -307,3 +307,52 @@ func PeriodsComplement(a []Period) []Period {
 	}
 	return c
 }
+
+// PeriodPartition split period by interval
+// period not support et is negative
+func PeriodPartition(p Period, interval int64) map[int64]Period {
+	m := make(map[int64]Period)
+	sti := p.st / interval
+	// infinity is not support partition
+	if p.et < 0 {
+		m[sti*interval] = p
+		return m
+	}
+	eti := p.et / interval
+	if sti == eti {
+		m[sti*interval] = p
+		return m
+	}
+	stp, _ := NewPeriod(p.st, (sti+1)*interval-1)
+	m[sti*interval] = stp
+
+	for i := sti + 1; i < eti; i++ {
+		t, _ := NewPeriod(i*interval, (i+1)*interval-1)
+		m[i*interval] = t
+	}
+
+	etp, _ := NewPeriod(eti*interval, p.et)
+	m[eti*interval] = etp
+
+	return m
+}
+
+// PeriodsPartition split periods by interval
+func PeriodsPartition(ps []Period, interval int64) map[int64][]Period {
+	m := make(map[int64][]Period)
+	for _, p := range ps {
+		t := PeriodPartition(p, interval)
+		for k, v := range t {
+			mv, ok := m[k]
+			if ok {
+				mv = append(mv, v)
+				m[k] = mv
+			} else {
+				mv = make([]Period, 0)
+				mv = append(mv, v)
+				m[k] = mv
+			}
+		}
+	}
+	return m
+}

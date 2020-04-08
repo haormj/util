@@ -1061,3 +1061,124 @@ func TestPeriodsComplement(t *testing.T) {
 		})
 	}
 }
+
+func TestPeriodPartition(t *testing.T) {
+	var newPeriod = func(st, et int64) Period {
+		p, _ := NewPeriod(st, et)
+		return p
+	}
+	type args struct {
+		p        Period
+		interval int64
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[int64]Period
+	}{
+		{
+			args: args{
+				p:        newPeriod(12, -1),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, -1),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(12, 18),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, 18),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(12, 27),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, 19),
+				20: newPeriod(20, 27),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(12, 39),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, 19),
+				20: newPeriod(20, 29),
+				30: newPeriod(30, 39),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(10, 20),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(10, 19),
+				20: newPeriod(20, 20),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PeriodPartition(tt.args.p, tt.args.interval); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodPartition() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPeriodsPartition(t *testing.T) {
+	var newPeriods = func(se ...int64) []Period {
+		ps, _ := NewPeriods(se...)
+		return ps
+	}
+	type args struct {
+		ps       []Period
+		interval int64
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[int64][]Period
+	}{
+		{
+			args: args{
+				ps:       newPeriods(12, 18, 23, 47),
+				interval: 10,
+			},
+			want: map[int64][]Period{
+				10: newPeriods(12, 18),
+				20: newPeriods(23, 29),
+				30: newPeriods(30, 39),
+				40: newPeriods(40, 47),
+			},
+		},
+		{
+			args: args{
+				ps:       newPeriods(12, 18, 23, 47, 15, 27, 12, 15),
+				interval: 10,
+			},
+			want: map[int64][]Period{
+				10: newPeriods(12, 18, 15, 19, 12, 15),
+				20: newPeriods(23, 29, 20, 27),
+				30: newPeriods(30, 39),
+				40: newPeriods(40, 47),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PeriodsPartition(tt.args.ps, tt.args.interval); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodsPartition() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
