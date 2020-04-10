@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"sort"
 )
 
 var (
@@ -25,27 +26,6 @@ func (p Period) St() int64 {
 
 func (p Period) Et() int64 {
 	return p.et
-}
-
-type Periods []Period
-
-// Len is the number of elements in the collection.
-func (p Periods) Len() int {
-	return len(p)
-}
-
-// Less reports whether the element with
-// index i should sort before the element with index j.
-func (p Periods) Less(i, j int) bool {
-	if p[i].st < p[j].st {
-		return true
-	}
-	return false
-}
-
-// Swap swaps the elements with indexes i and j.
-func (p Periods) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
 }
 
 // NewPeriod create a period
@@ -160,8 +140,8 @@ func PeriodUnion(p1 Period, p2 Period) []Period {
 	return []Period{p1, p2}
 }
 
-// PeriodIntersect intersect two period
-func PeriodIntersect(p1 Period, p2 Period) []Period {
+// PeriodIntersection intersect two period
+func PeriodIntersection(p1 Period, p2 Period) []Period {
 	switch {
 	case p2.et < 0 && p1.et < 0:
 		st := p2.st
@@ -190,7 +170,7 @@ func PeriodIntersect(p1 Period, p2 Period) []Period {
 			return ps
 		}
 	case p2.et < 0:
-		return PeriodIntersect(p2, p1)
+		return PeriodIntersection(p2, p1)
 	default:
 		switch {
 		case p2.et < p1.st:
@@ -233,59 +213,8 @@ func PeriodIntersect(p1 Period, p2 Period) []Period {
 	return []Period{}
 }
 
-// PeriodsContains judge is t in periods
-func PeriodsContains(t int64, ps []Period) bool {
-	for _, p := range ps {
-		if PeriodContains(t, p) {
-			return true
-		}
-	}
-	return false
-}
-
-// AddPeriodToResultSet add a period to result set
-// ResultSet is a set of period, all elements has been union
-func AddPeriodToResultSet(p Period, rs []Period) []Period {
-	if len(rs) == 0 {
-		return []Period{p}
-	}
-	for i := 0; i < len(rs); i++ {
-		ps := PeriodUnion(p, rs[i])
-		if len(ps) == 1 {
-			t := rs[:i]
-			if i+1 < len(rs) {
-				t = append(t, rs[i+1:]...)
-			}
-			return AddPeriodToResultSet(ps[0], t)
-		}
-	}
-	return append(rs, p)
-}
-
-// PeriodsUnion union two periods
-func PeriodsUnion(a []Period, b []Period) []Period {
-	ps := append(a, b...)
-	rs := make([]Period, 0)
-	for _, p := range ps {
-		rs = AddPeriodToResultSet(p, rs)
-	}
-	return rs
-}
-
-// PeriodsIntersect intersect two periods
-func PeriodsIntersect(a []Period, b []Period) []Period {
-	c := make([]Period, 0)
-	for _, i := range a {
-		for _, j := range b {
-			k := PeriodIntersect(i, j)
-			c = append(c, k...)
-		}
-	}
-	return c
-}
-
-// PeriodComplement period complement
-func PeriodComplement(a Period, b Period) []Period {
+// PeriodDifference b - a
+func PeriodDifference(b Period, a Period) []Period {
 	switch {
 	case a.et < 0 && b.et < 0:
 		switch {
@@ -361,27 +290,6 @@ func PeriodComplement(a Period, b Period) []Period {
 	return []Period{}
 }
 
-// https://en.wikipedia.org/wiki/Complement_(set_theory)
-func PeriodsComplement(a []Period, b []Period) []Period {
-	if len(a) < 1 {
-		t := make([]Period, len(b))
-		copy(t, b)
-		return t
-	}
-
-	c := make([]Period, len(b))
-	copy(c, b)
-	for _, i := range a {
-		t := make([]Period, 0)
-		for _, j := range c {
-			ps := PeriodComplement(i, j)
-			t = append(t, ps...)
-		}
-		c = t
-	}
-	return c
-}
-
 // PeriodPartition split period by interval
 // period not support et is negative
 func PeriodPartition(p Period, interval int64) map[int64]Period {
@@ -411,6 +319,92 @@ func PeriodPartition(p Period, interval int64) map[int64]Period {
 	return m
 }
 
+// PeriodMinSuperSet period mininum super set
+func PeriodMinSuperSet(p Period, interval int64) Period {
+	sti := p.st / interval
+	st := sti * interval
+	if p.et < 0 {
+		ss, _ := NewPeriod(st, p.et)
+		return ss
+	}
+	eti := p.et / interval
+	et := (eti+1)*interval - 1
+	ss, _ := NewPeriod(st, et)
+	return ss
+}
+
+// PeriodsContains judge is t in periods
+func PeriodsContains(t int64, ps []Period) bool {
+	for _, p := range ps {
+		if PeriodContains(t, p) {
+			return true
+		}
+	}
+	return false
+}
+
+// AddPeriodToResultSet add a period to result set
+// ResultSet is a set of period, all elements has been union
+func AddPeriodToResultSet(p Period, rs []Period) []Period {
+	if len(rs) == 0 {
+		return []Period{p}
+	}
+	for i := 0; i < len(rs); i++ {
+		ps := PeriodUnion(p, rs[i])
+		if len(ps) == 1 {
+			t := rs[:i]
+			if i+1 < len(rs) {
+				t = append(t, rs[i+1:]...)
+			}
+			return AddPeriodToResultSet(ps[0], t)
+		}
+	}
+	return append(rs, p)
+}
+
+// PeriodsUnion union two periods
+func PeriodsUnion(a []Period, b []Period) []Period {
+	ps := append(a, b...)
+	rs := make([]Period, 0)
+	for _, p := range ps {
+		rs = AddPeriodToResultSet(p, rs)
+	}
+	return rs
+}
+
+// PeriodsIntersection intersect two periods
+func PeriodsIntersection(a []Period, b []Period) []Period {
+	c := make([]Period, 0)
+	for _, i := range a {
+		for _, j := range b {
+			k := PeriodIntersection(i, j)
+			c = append(c, k...)
+		}
+	}
+	return c
+}
+
+// PeriodsDifference b - a
+func PeriodsDifference(b []Period, a []Period) []Period {
+	if len(a) < 1 {
+		t := make([]Period, len(b))
+		copy(t, b)
+		return t
+	}
+
+	c := make([]Period, len(b))
+	copy(c, b)
+	for _, i := range a {
+		t := make([]Period, 0)
+		for _, j := range c {
+			ps := PeriodDifference(j, i)
+			t = append(t, ps...)
+		}
+		c = t
+	}
+	return c
+}
+
 // PeriodsPartition split periods by interval
 func PeriodsPartition(ps []Period, interval int64) map[int64][]Period {
 	m := make(map[int64][]Period)
@@ -429,4 +423,34 @@ func PeriodsPartition(ps []Period, interval int64) map[int64][]Period {
 		}
 	}
 	return m
+}
+
+// PeriodsMinSuperSet periods mininum super set
+func PeriodsMinSuperSet(ps []Period, interval int64) []Period {
+	t := make([]Period, 0)
+	for _, p := range ps {
+		ss := PeriodMinSuperSet(p, interval)
+		t = append(t, ss)
+	}
+	return PeriodsUnion(t, []Period{})
+}
+
+// PeriodsSortAsc sort periods by asc
+func PeriodsSortAsc(ps []Period) {
+	sort.Slice(ps, func(i, j int) bool {
+		if ps[i].St() < ps[j].St() {
+			return true
+		}
+		return false
+	})
+}
+
+// PeriodsSortDesc sort periods by desc
+func PeriodsSortDesc(ps []Period) {
+	sort.Slice(ps, func(i, j int) bool {
+		if ps[i].St() > ps[j].St() {
+			return true
+		}
+		return false
+	})
 }

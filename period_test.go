@@ -2,7 +2,6 @@ package util
 
 import (
 	"reflect"
-	"sort"
 	"testing"
 )
 
@@ -357,7 +356,7 @@ func TestPeriodUnion(t *testing.T) {
 	}
 }
 
-func TestPeriodIntersect(t *testing.T) {
+func TestPeriodIntersection(t *testing.T) {
 	var newPeriod = func(st, et int64) Period {
 		p, _ := NewPeriod(st, et)
 		return p
@@ -522,8 +521,316 @@ func TestPeriodIntersect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := PeriodIntersect(tt.args.p1, tt.args.p2); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PeriodIntersect() = %v, want %v", got, tt.want)
+			if got := PeriodIntersection(tt.args.p1, tt.args.p2); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodIntersection() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPeriodDifference(t *testing.T) {
+	var newPeriod = func(st, et int64) Period {
+		p, _ := NewPeriod(st, et)
+		return p
+	}
+	var newPeriods = func(se ...int64) []Period {
+		ps, _ := NewPeriods(se...)
+		return ps
+	}
+	type args struct {
+		b Period
+		a Period
+	}
+	tests := []struct {
+		name string
+		args args
+		want []Period
+	}{
+		{
+			args: args{
+				b: newPeriod(10, -1),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(10, 29),
+		},
+		{
+			args: args{
+				b: newPeriod(30, -1),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				b: newPeriod(40, -1),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				b: newPeriod(10, 20),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(10, 20),
+		},
+		{
+			args: args{
+				b: newPeriod(20, 30),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(20, 29),
+		},
+		{
+			args: args{
+				b: newPeriod(25, 35),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(25, 29),
+		},
+		{
+			args: args{
+				b: newPeriod(30, 40),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				b: newPeriod(40, 50),
+				a: newPeriod(30, -1),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				b: newPeriod(10, -1),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(10, 29, 41, -1),
+		},
+		{
+			args: args{
+				b: newPeriod(30, -1),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, -1),
+		},
+		{
+			args: args{
+				b: newPeriod(35, -1),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, -1),
+		},
+		{
+			args: args{
+				b: newPeriod(40, -1),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, -1),
+		},
+		{
+			args: args{
+				b: newPeriod(45, -1),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(45, -1),
+		},
+		{
+			args: args{
+				b: newPeriod(10, 20),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(10, 20),
+		},
+		{
+			args: args{
+				b: newPeriod(20, 30),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(20, 29),
+		},
+		{
+			args: args{
+				b: newPeriod(35, 45),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, 45),
+		},
+		{
+			args: args{
+				b: newPeriod(40, 50),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, 50),
+		},
+		{
+			args: args{
+				b: newPeriod(50, 60),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(50, 60),
+		},
+		{
+			args: args{
+				b: newPeriod(10, 60),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(10, 29, 41, 60),
+		},
+		{
+			args: args{
+				b: newPeriod(30, 60),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, 60),
+		},
+		{
+			args: args{
+				b: newPeriod(35, 60),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, 60),
+		},
+		{
+			args: args{
+				b: newPeriod(40, 60),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(41, 60),
+		},
+		{
+			args: args{
+				b: newPeriod(50, 60),
+				a: newPeriod(30, 40),
+			},
+			want: newPeriods(50, 60),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PeriodDifference(tt.args.b, tt.args.a); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodDifference() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPeriodPartition(t *testing.T) {
+	var newPeriod = func(st, et int64) Period {
+		p, _ := NewPeriod(st, et)
+		return p
+	}
+	type args struct {
+		p        Period
+		interval int64
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[int64]Period
+	}{
+		{
+			args: args{
+				p:        newPeriod(12, -1),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, -1),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(12, 18),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, 18),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(12, 27),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, 19),
+				20: newPeriod(20, 27),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(12, 39),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(12, 19),
+				20: newPeriod(20, 29),
+				30: newPeriod(30, 39),
+			},
+		},
+		{
+			args: args{
+				p:        newPeriod(10, 20),
+				interval: 10,
+			},
+			want: map[int64]Period{
+				10: newPeriod(10, 19),
+				20: newPeriod(20, 20),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PeriodPartition(tt.args.p, tt.args.interval); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodPartition() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPeriodMinSuperSet(t *testing.T) {
+	var newPeriod = func(st, et int64) Period {
+		p, _ := NewPeriod(st, et)
+		return p
+	}
+
+	type args struct {
+		p        Period
+		interval int64
+	}
+	tests := []struct {
+		name string
+		args args
+		want Period
+	}{
+		{
+			args: args{
+				p:        newPeriod(2, 5),
+				interval: 10,
+			},
+			want: newPeriod(0, 9),
+		},
+		{
+			args: args{
+				p:        newPeriod(2, 10),
+				interval: 10,
+			},
+			want: newPeriod(0, 19),
+		},
+		{
+			args: args{
+				p:        newPeriod(2, -1),
+				interval: 10,
+			},
+			want: newPeriod(0, -1),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PeriodMinSuperSet(tt.args.p, tt.args.interval); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodMinSuperSet() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -936,7 +1243,7 @@ func TestPeriodsUnion(t *testing.T) {
 	}
 }
 
-func TestPeriodsIntersect(t *testing.T) {
+func TestPeriodsIntersection(t *testing.T) {
 	var newPeriods = func(se ...int64) []Period {
 		ps, _ := NewPeriods(se...)
 		return ps
@@ -974,20 +1281,21 @@ func TestPeriodsIntersect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := PeriodsIntersect(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PeriodsIntersect() = %v, want %v", got, tt.want)
+			if got := PeriodsIntersection(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodsIntersection() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestPeriodsSort(t *testing.T) {
+func TestPeriodsDifference(t *testing.T) {
 	var newPeriods = func(se ...int64) []Period {
 		ps, _ := NewPeriods(se...)
 		return ps
 	}
 	type args struct {
 		a []Period
+		b []Period
 	}
 	tests := []struct {
 		name string
@@ -996,93 +1304,23 @@ func TestPeriodsSort(t *testing.T) {
 	}{
 		{
 			args: args{
-				a: newPeriods(3, 4, 1, 2, 8, 9, 20, 30, 12, 14),
+				b: newPeriods(15, 25, 32, 38, 50, 60),
+				a: newPeriods(10, 20, 30, 40),
 			},
-			want: newPeriods(1, 2, 3, 4, 8, 9, 12, 14, 20, 30),
+			want: newPeriods(21, 25, 50, 60),
+		},
+		{
+			args: args{
+				b: newPeriods(5, 15, 10, 25, 32, 47),
+				a: newPeriods(10, 20, 15, 30, 35, 40),
+			},
+			want: newPeriods(5, 9, 32, 34, 41, 47),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tmp := make([]Period, len(tt.args.a))
-			copy(tmp, tt.args.a)
-			sort.Sort(Periods(tmp))
-			got := []Period(tmp)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TestPeriodsSort() args: %v, got: %v, want %v", tt.args.a, got, tt.want)
-			}
-		})
-	}
-
-}
-
-func TestPeriodPartition(t *testing.T) {
-	var newPeriod = func(st, et int64) Period {
-		p, _ := NewPeriod(st, et)
-		return p
-	}
-	type args struct {
-		p        Period
-		interval int64
-	}
-	tests := []struct {
-		name string
-		args args
-		want map[int64]Period
-	}{
-		{
-			args: args{
-				p:        newPeriod(12, -1),
-				interval: 10,
-			},
-			want: map[int64]Period{
-				10: newPeriod(12, -1),
-			},
-		},
-		{
-			args: args{
-				p:        newPeriod(12, 18),
-				interval: 10,
-			},
-			want: map[int64]Period{
-				10: newPeriod(12, 18),
-			},
-		},
-		{
-			args: args{
-				p:        newPeriod(12, 27),
-				interval: 10,
-			},
-			want: map[int64]Period{
-				10: newPeriod(12, 19),
-				20: newPeriod(20, 27),
-			},
-		},
-		{
-			args: args{
-				p:        newPeriod(12, 39),
-				interval: 10,
-			},
-			want: map[int64]Period{
-				10: newPeriod(12, 19),
-				20: newPeriod(20, 29),
-				30: newPeriod(30, 39),
-			},
-		},
-		{
-			args: args{
-				p:        newPeriod(10, 20),
-				interval: 10,
-			},
-			want: map[int64]Period{
-				10: newPeriod(10, 19),
-				20: newPeriod(20, 20),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := PeriodPartition(tt.args.p, tt.args.interval); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PeriodPartition() = %v, want %v", got, tt.want)
+			if got := PeriodsDifference(tt.args.b, tt.args.a); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodsDifference() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -1136,18 +1374,14 @@ func TestPeriodsPartition(t *testing.T) {
 	}
 }
 
-func TestPeriodComplement(t *testing.T) {
-	var newPeriod = func(st, et int64) Period {
-		p, _ := NewPeriod(st, et)
-		return p
-	}
+func TestPeriodsMinSuperSet(t *testing.T) {
 	var newPeriods = func(se ...int64) []Period {
 		ps, _ := NewPeriods(se...)
 		return ps
 	}
 	type args struct {
-		a Period
-		b Period
+		ps       []Period
+		interval int64
 	}
 	tests := []struct {
 		name string
@@ -1156,171 +1390,89 @@ func TestPeriodComplement(t *testing.T) {
 	}{
 		{
 			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(10, -1),
+				ps:       newPeriods(2, 5),
+				interval: 10,
 			},
-			want: newPeriods(10, 29),
+			want: newPeriods(0, 9),
 		},
 		{
 			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(30, -1),
+				ps:       newPeriods(2, 5, 32, 48),
+				interval: 10,
 			},
-			want: newPeriods(),
+			want: newPeriods(0, 9, 30, 49),
 		},
 		{
 			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(40, -1),
+				ps:       newPeriods(2, 5, 12, 17, 32, 48, 50, -1),
+				interval: 10,
 			},
-			want: newPeriods(),
-		},
-		{
-			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(10, 20),
-			},
-			want: newPeriods(10, 20),
-		},
-		{
-			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(20, 30),
-			},
-			want: newPeriods(20, 29),
-		},
-		{
-			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(25, 35),
-			},
-			want: newPeriods(25, 29),
-		},
-		{
-			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(30, 40),
-			},
-			want: newPeriods(),
-		},
-		{
-			args: args{
-				a: newPeriod(30, -1),
-				b: newPeriod(40, 50),
-			},
-			want: newPeriods(),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(10, -1),
-			},
-			want: newPeriods(10, 29, 41, -1),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(30, -1),
-			},
-			want: newPeriods(41, -1),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(35, -1),
-			},
-			want: newPeriods(41, -1),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(40, -1),
-			},
-			want: newPeriods(41, -1),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(45, -1),
-			},
-			want: newPeriods(45, -1),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(10, 20),
-			},
-			want: newPeriods(10, 20),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(20, 30),
-			},
-			want: newPeriods(20, 29),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(35, 45),
-			},
-			want: newPeriods(41, 45),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(40, 50),
-			},
-			want: newPeriods(41, 50),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(50, 60),
-			},
-			want: newPeriods(50, 60),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(10, 60),
-			},
-			want: newPeriods(10, 29, 41, 60),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(30, 60),
-			},
-			want: newPeriods(41, 60),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(35, 60),
-			},
-			want: newPeriods(41, 60),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(40, 60),
-			},
-			want: newPeriods(41, 60),
-		},
-		{
-			args: args{
-				a: newPeriod(30, 40),
-				b: newPeriod(50, 60),
-			},
-			want: newPeriods(50, 60),
+			want: newPeriods(0, 9, 10, 19, 30, 49, 50, -1),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := PeriodComplement(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PeriodComplement() = %v, want %v", got, tt.want)
+			if got := PeriodsMinSuperSet(tt.args.ps, tt.args.interval); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodsMinSuperSet() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestPeriodsSortAsc(t *testing.T) {
+	var newPeriods = func(se ...int64) []Period {
+		ps, _ := NewPeriods(se...)
+		return ps
+	}
+	type args struct {
+		ps []Period
+	}
+	tests := []struct {
+		name string
+		args args
+		want []Period
+	}{
+		{
+			args: args{
+				ps: newPeriods(3, 4, 1, 2, 8, 9, 20, 30, 12, 14),
+			},
+			want: newPeriods(1, 2, 3, 4, 8, 9, 12, 14, 20, 30),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if PeriodsSortAsc(tt.args.ps); !reflect.DeepEqual(tt.args.ps, tt.want) {
+				t.Errorf("PeriodsSortAsc() = %v, want %v", tt.args.ps, tt.want)
+			}
+
+		})
+	}
+}
+
+func TestPeriodsSortDesc(t *testing.T) {
+	var newPeriods = func(se ...int64) []Period {
+		ps, _ := NewPeriods(se...)
+		return ps
+	}
+	type args struct {
+		ps []Period
+	}
+	tests := []struct {
+		name string
+		args args
+		want []Period
+	}{
+		{
+			args: args{
+				ps: newPeriods(3, 4, 1, 2, 8, 9, 20, 30, 12, 14),
+			},
+			want: newPeriods(20, 30, 12, 14, 8, 9, 3, 4, 1, 2),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			PeriodsSortDesc(tt.args.ps)
 		})
 	}
 }
