@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"sort"
 )
 
 var (
@@ -285,25 +284,100 @@ func PeriodsIntersect(a []Period, b []Period) []Period {
 	return c
 }
 
-// PeriodsComplement periods complement
-// u = [a.min_st, a.max_et]
-// https://en.wikipedia.org/wiki/Complement_(set_theory)
-func PeriodsComplement(a []Period) []Period {
-	if len(a) < 1 {
-		return []Period{}
-	}
-	b := PeriodsUnion(a, []Period{})
-	sort.Sort(Periods(b))
-	c := make([]Period, 0)
-	for i := 0; i < len(b)-1; i++ {
-		st := b[i].et + 1
-		// et not negative
-		et := b[i+1].st - 1
-		p, err := NewPeriod(st, et)
-		if err != nil {
-			continue
+// PeriodComplement period complement
+func PeriodComplement(a Period, b Period) []Period {
+	switch {
+	case a.et < 0 && b.et < 0:
+		switch {
+		case b.st < a.st:
+			ps, _ := NewPeriods(b.st, a.st-1)
+			return ps
+		case b.st == a.st, b.st > a.st:
+			return []Period{}
 		}
-		c = append(c, p)
+	case a.et < 0:
+		switch {
+		case b.et < a.st:
+			ps, _ := NewPeriods(b.st, b.et)
+			return ps
+		case b.et == a.st:
+			ps, err := NewPeriods(b.st, b.et-1)
+			if err != nil {
+				return []Period{}
+			}
+			return ps
+		case b.et > a.st:
+			switch {
+			case b.st < a.st:
+				ps, _ := NewPeriods(b.st, a.st-1)
+				return ps
+			case b.st == a.st, b.st > a.st:
+				return []Period{}
+			}
+		}
+	case b.et < 0:
+		switch {
+		case b.st < a.st:
+			ps, _ := NewPeriods(b.st, a.st-1, a.et+1, b.et)
+			return ps
+		case b.st == a.st, b.st > a.st && b.st < a.et, b.st == a.et:
+			ps, _ := NewPeriods(a.et+1, b.et)
+			return ps
+		case b.st > a.et:
+			ps, _ := NewPeriods(b.st, b.et)
+			return ps
+		}
+	default:
+		switch {
+		case b.et < a.st:
+			ps, _ := NewPeriods(b.st, b.et)
+			return ps
+		case b.et == a.st:
+			ps, err := NewPeriods(b.st, b.et-1)
+			if err != nil {
+				return []Period{}
+			}
+			return ps
+		case b.et > a.st && b.et < a.et, b.et == a.et:
+			ps, err := NewPeriods(b.st, a.st-1)
+			if err != nil {
+				return []Period{}
+			}
+			return ps
+		case b.et > a.et:
+			switch {
+			case b.st < a.st:
+				ps, _ := NewPeriods(b.st, a.st-1, a.et+1, b.et)
+				return ps
+			case b.st == a.st, b.st > a.st && b.st < a.et, b.st == a.et:
+				ps, _ := NewPeriods(a.et+1, b.et)
+				return ps
+			case b.st > a.et:
+				ps, _ := NewPeriods(b.st, b.et)
+				return ps
+			}
+		}
+	}
+	return []Period{}
+}
+
+// https://en.wikipedia.org/wiki/Complement_(set_theory)
+func PeriodsComplement(a []Period, b []Period) []Period {
+	if len(a) < 1 {
+		t := make([]Period, len(b))
+		copy(t, b)
+		return t
+	}
+
+	c := make([]Period, len(b))
+	copy(c, b)
+	for _, i := range a {
+		t := make([]Period, 0)
+		for _, j := range c {
+			ps := PeriodComplement(i, j)
+			t = append(t, ps...)
+		}
+		c = t
 	}
 	return c
 }

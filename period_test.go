@@ -1015,53 +1015,6 @@ func TestPeriodsSort(t *testing.T) {
 
 }
 
-func TestPeriodsComplement(t *testing.T) {
-	var newPeriods = func(se ...int64) []Period {
-		ps, _ := NewPeriods(se...)
-		return ps
-	}
-	type args struct {
-		a []Period
-	}
-	tests := []struct {
-		name string
-		args args
-		want []Period
-	}{
-		{
-			args: args{
-				a: newPeriods(),
-			},
-			want: newPeriods(),
-		},
-		{
-			args: args{
-				a: newPeriods(0, 0),
-			},
-			want: newPeriods(),
-		},
-		{
-			args: args{
-				a: newPeriods(0, 0, 1, 2),
-			},
-			want: newPeriods(),
-		},
-		{
-			args: args{
-				a: newPeriods(1, 2, 5, 6, 10, 10, 20, 30, 60, -1),
-			},
-			want: newPeriods(3, 4, 7, 9, 11, 19, 31, 59),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := PeriodsComplement(tt.args.a); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PeriodsIntersect() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestPeriodPartition(t *testing.T) {
 	var newPeriod = func(st, et int64) Period {
 		p, _ := NewPeriod(st, et)
@@ -1178,6 +1131,195 @@ func TestPeriodsPartition(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := PeriodsPartition(tt.args.ps, tt.args.interval); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("PeriodsPartition() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPeriodComplement(t *testing.T) {
+	var newPeriod = func(st, et int64) Period {
+		p, _ := NewPeriod(st, et)
+		return p
+	}
+	var newPeriods = func(se ...int64) []Period {
+		ps, _ := NewPeriods(se...)
+		return ps
+	}
+	type args struct {
+		a Period
+		b Period
+	}
+	tests := []struct {
+		name string
+		args args
+		want []Period
+	}{
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(10, -1),
+			},
+			want: newPeriods(10, 29),
+		},
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(30, -1),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(40, -1),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(10, 20),
+			},
+			want: newPeriods(10, 20),
+		},
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(20, 30),
+			},
+			want: newPeriods(20, 29),
+		},
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(25, 35),
+			},
+			want: newPeriods(25, 29),
+		},
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(30, 40),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				a: newPeriod(30, -1),
+				b: newPeriod(40, 50),
+			},
+			want: newPeriods(),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(10, -1),
+			},
+			want: newPeriods(10, 29, 41, -1),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(30, -1),
+			},
+			want: newPeriods(41, -1),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(35, -1),
+			},
+			want: newPeriods(41, -1),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(40, -1),
+			},
+			want: newPeriods(41, -1),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(45, -1),
+			},
+			want: newPeriods(45, -1),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(10, 20),
+			},
+			want: newPeriods(10, 20),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(20, 30),
+			},
+			want: newPeriods(20, 29),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(35, 45),
+			},
+			want: newPeriods(41, 45),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(40, 50),
+			},
+			want: newPeriods(41, 50),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(50, 60),
+			},
+			want: newPeriods(50, 60),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(10, 60),
+			},
+			want: newPeriods(10, 29, 41, 60),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(30, 60),
+			},
+			want: newPeriods(41, 60),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(35, 60),
+			},
+			want: newPeriods(41, 60),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(40, 60),
+			},
+			want: newPeriods(41, 60),
+		},
+		{
+			args: args{
+				a: newPeriod(30, 40),
+				b: newPeriod(50, 60),
+			},
+			want: newPeriods(50, 60),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PeriodComplement(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PeriodComplement() = %v, want %v", got, tt.want)
 			}
 		})
 	}
