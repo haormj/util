@@ -84,6 +84,11 @@ func SQL(do DoFunc) *ElasticSearchRequest {
 	return Post("_sql?format=csv", do)
 }
 
+func Insert(index, id string, do DoFunc) *ElasticSearchRequest {
+	url := path.Join(index, "_doc", id)
+	return Post(url, do)
+}
+
 // Post 快速构造一个 Post 请求
 func Post(url string, do DoFunc) *ElasticSearchRequest {
 	return NewElasticSearchRequest(url, http.MethodPost, do)
