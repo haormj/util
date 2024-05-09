@@ -153,7 +153,7 @@ func (e *ElasticSearchRequest) Body(data any) *ElasticSearchRequest {
 func (e *ElasticSearchRequest) JSONBody(a any) *ElasticSearchRequest {
 	e.req.Header.Set("Content-Type", "application/json")
 	switch a.(type) {
-	case string:
+	case string, []byte:
 		return e.Body(a)
 	}
 	b, err := json.Marshal(a)
